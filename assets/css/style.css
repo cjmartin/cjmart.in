@@ -1,0 +1,79 @@
+/* General styles */
+body {
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f8ff;
+    font-family: 'Inter', sans-serif;
+    color: #2c3e50;
+}
+
+/* General link styles */
+a {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: normal;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #1abc9c;
+}
+
+/* Headings */
+h1 {
+    font-family: 'Merriweather', serif;
+    margin: 0 0 20px;
+}
+
+/* Paragraphs */
+p {
+    line-height: 1.5;
+    margin: 0 0 16px;
+}
+
+/* Highlight the active image link (bold, no underline) */
+a[data-image].active {
+    font-weight: 600;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Image section (left side) */
+#image-section {
+    flex: 1;
+    background: url('https://assets.about.me/background/cjmartin_1286511296_43.jpg') no-repeat center center;
+    background-size: cover;
+    transition: background-image 0.5s ease-in-out;
+}
+
+/* Text section (right side) */
+#text-section {
+    flex: 0.4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+#about {
+    max-width: 400px; /* Adjust as needed */
+    width: 100%;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+        height: auto;
+    }
+    #image-section {
+        height: 50vh;
+    }
+    #text-section {
+        flex: none;
+        padding: 20px;
+        text-align: center;
+    }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;700&family=Inter:wght@300;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>
+<body>
+    <div id="image-section"></div>
+    <div id="text-section">
+        <section id="about">
+            {{ content }}
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const imageSection = document.getElementById("image-section");
+    
+            function setImage(imageName, activeLink) {
+                if (imageName) {
+                    imageSection.style.backgroundImage = `url('/assets/images/${imageName}')`;
+    
+                    // Remove "active" class from all image-changing links
+                    document.querySelectorAll("#text-section a[data-image]").forEach(link => {
+                        link.classList.remove("active");
+                    });
+    
+                    // Add "active" class to the clicked link
+                    if (activeLink) {
+                        activeLink.classList.add("active");
+                    }
+                }
+            }
+    
+            // Check if the page is loaded with a hash (e.g., #dad)
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const link = document.querySelector(`#text-section a[href="#${hash}"]`);
+                if (link) {
+                    const newImage = link.getAttribute("data-image");
+                    setImage(newImage, link);
+                }
+            }
+    
+            // Handle click events on image-changing links
+            document.querySelectorAll("#text-section a[data-image]").forEach(item => {
+                item.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    const newImage = this.getAttribute("data-image");
+                    setImage(newImage, this);
+                    history.replaceState(null, null, this.getAttribute("href"));
+                });
+            });
+        });
+    </script>    
+    
+</body>
+</html>
