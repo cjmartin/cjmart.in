@@ -1,10 +1,13 @@
 /* General styles */
 body {
     display: flex;
-    height: 100vh;
+    flex-direction: row; /* Explicitly set row direction for desktop */
+    min-height: 100vh; /* Use min-height instead of height for better responsiveness */
     margin: 0;
     background-color: #f0f8ff;
     font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
     color: #2c3e50;
 }
 
@@ -12,7 +15,7 @@ body {
 a {
     color: #2980b9;
     text-decoration: none;
-    font-weight: normal;
+    font-weight: 500;
     transition: color 0.2s;
 }
 
@@ -21,10 +24,15 @@ a:hover {
 }
 
 /* Headings */
-h1 {
-    font-family: 'Merriweather', serif;
+h1, h2, h3, h4 {
+    font-family: 'Cormorant', serif;
     margin: 0 0 20px;
 }
+
+h1 { font-size: 42px; }
+h2 { font-size: 32px; }
+h3 { font-size: 24px; }
+h4 { font-size: 16px; }
 
 /* Paragraphs */
 p {
@@ -34,20 +42,20 @@ p {
 
 /* Highlight the active image link (bold, no underline) */
 a[data-image].active {
-    font-weight: 600;
     text-decoration: none;
     color: inherit;
 }
 
-/* Image section (left side) */
+/* Image section (left side on desktop, top on mobile) */
 #image-section {
     flex: 1;
     background: url('https://assets.about.me/background/cjmartin_1286511296_43.jpg') no-repeat center center;
     background-size: cover;
     transition: background-image 0.5s ease-in-out;
+    min-height: 50vh; /* Ensure the image section has a minimum height */
 }
 
-/* Text section (right side) */
+/* Text section (right side on desktop, bottom on mobile) */
 #text-section {
     flex: 0.4;
     display: flex;
@@ -63,17 +71,59 @@ a[data-image].active {
     margin: 0 auto;
 }
 
+#about h1 {
+    font-size: 52px;
+}
+
+@media (max-width: 1100px) {
+    #about h1 {
+        font-size: 36px;
+    }
+    #about p {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 800px) {
+    #about h1 {
+        font-size: 32px;
+    }
+}
+
+/* Mobile layout adjustments */
 @media (max-width: 768px) {
     body {
-        flex-direction: column;
-        height: auto;
+        flex-direction: column; /* Stack elements vertically on mobile */
     }
+    
     #image-section {
-        height: 50vh;
+        /* Take up the top portion of the screen */
+        min-height: 45vh; /* Adjust height as needed */
+        width: 100%;
     }
+    
     #text-section {
-        flex: none;
-        padding: 20px;
-        text-align: center;
+        /* Take up the bottom portion of the screen */
+        width: 100%;
+        padding: 30px 20px; /* Reduced padding for mobile */
+        box-sizing: border-box;
+        justify-content: flex-start;
+    }
+    
+    #about {
+        max-width: 100%; /* Allow content to use full width on mobile */
+    }
+}
+
+@media (max-width: 360px) {
+    #about h1 {
+        font-size: 28px;
+    }
+    #about p {
+        font-size: 14px;
+    }
+    
+    #text-section {
+        padding: 20px 15px; /* Further reduce padding for very small screens */
     }
 }
