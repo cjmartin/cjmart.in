@@ -54,10 +54,6 @@ a {
     transition: color 0.2s ease;
 }
 
-a:hover {
-    color: var(--color-primary-hover);
-}
-
 /* Headings with responsive font sizing using clamp */
 h1, h2, h3, h4 {
     font-family: var(--font-serif);

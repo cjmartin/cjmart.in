@@ -19,9 +19,15 @@
         document.addEventListener("DOMContentLoaded", function () {
             const imageSection = document.getElementById("image-section");
     
-            function setImage(imageName, activeLink) {
-                if (imageName) {
+            function setImage(activeLink) {
+                if (activeLink) {
+                    console.log(activeLink);
+                    const imageName = activeLink.getAttribute("data-image");
+                    const imagePosition = activeLink.getAttribute("data-image-position");
+                    if (!imageName) return;
+
                     imageSection.style.backgroundImage = `url('/assets/images/${imageName}')`;
+                    imageSection.style.backgroundPosition = imagePosition ? imagePosition : '';
     
                     // Remove "active" class from all image-changing links
                     document.querySelectorAll("#text-section a[data-image]").forEach(link => {
@@ -40,8 +46,7 @@
             if (hash) {
                 const link = document.querySelector(`#text-section a[href="#${hash}"]`);
                 if (link) {
-                    const newImage = link.getAttribute("data-image");
-                    setImage(newImage, link);
+                    setImage(link);
                 }
             }
     
@@ -49,8 +54,7 @@
             document.querySelectorAll("#text-section a[data-image]").forEach(item => {
                 item.addEventListener("click", function (event) {
                     event.preventDefault();
-                    const newImage = this.getAttribute("data-image");
-                    setImage(newImage, this);
+                    setImage(this);
                     history.replaceState(null, null, this.getAttribute("href"));
                 });
             });
