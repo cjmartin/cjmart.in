@@ -135,7 +135,7 @@ a[data-image].active {
         top: 0;
         left: 0;
         right: 0;
-        height: 45vh;
+        min-height: 45vh;
         width: 100%;
         z-index: 1;
     }
@@ -143,7 +143,7 @@ a[data-image].active {
     #text-section {
         position: relative;
         width: 100%;
-        margin-top: 40vh;
+        margin-top: 43vh;
         padding: var(--spacing-md) var(--spacing-sm);
         justify-content: flex-start;
         z-index: 2;
@@ -160,7 +160,6 @@ a[data-image].active {
 @media (max-width: 360px) {
     #text-section {
         padding: var(--spacing-sm) var(--spacing-xs);
-        margin-top: 38vh;
     }
 }
 
