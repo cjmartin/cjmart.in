@@ -1,140 +1,208 @@
+/* CSS Variables for better maintainability */
+:root {
+    /* Colors */
+    --color-primary: #2980b9;
+    --color-primary-hover: #1abc9c;
+    --color-text: #2c3e50;
+    --color-background: #f0f8ff;
+    
+    /* Typography */
+    --font-sans: 'Inter', sans-serif;
+    --font-serif: 'Cormorant', serif;
+    --font-weight-normal: 300;
+    --font-weight-medium: 500;
+    
+    /* Spacing */
+    --spacing-xs: 15px;
+    --spacing-sm: 20px;
+    --spacing-md: 30px;
+    --spacing-lg: 60px;
+    
+    /* Breakpoints */
+    --breakpoint-sm: 360px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 800px;
+    --breakpoint-xl: 1100px;
+}
+
+/* Reset and base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 /* General styles */
 body {
     display: flex;
-    flex-direction: row; /* Explicitly set row direction for desktop */
-    min-height: 100vh; /* Use min-height instead of height for better responsiveness */
+    flex-direction: row;
+    min-height: 100vh;
     margin: 0;
-    background-color: #f0f8ff;
-    font-family: 'Inter', sans-serif;
-    font-weight: 300;
+    background-color: var(--color-background);
+    font-family: var(--font-sans);
+    font-weight: var(--font-weight-normal);
     font-size: 16px;
-    color: #2c3e50;
+    color: var(--color-text);
+    line-height: 1.5;
 }
 
 /* General link styles */
 a {
-    color: #2980b9;
+    color: var(--color-primary);
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
+    font-weight: var(--font-weight-medium);
+    transition: color 0.2s ease;
 }
 
 a:hover {
-    color: #1abc9c;
+    color: var(--color-primary-hover);
 }
 
-/* Headings */
+/* Headings with responsive font sizing using clamp */
 h1, h2, h3, h4 {
-    font-family: 'Cormorant', serif;
-    margin: 0 0 20px;
+    font-family: var(--font-serif);
+    margin: 0 0 var(--spacing-sm);
 }
 
-h1 { font-size: 42px; }
-h2 { font-size: 32px; }
-h3 { font-size: 24px; }
-h4 { font-size: 16px; }
+h1 { font-size: clamp(28px, 5vw, 52px); }
+h2 { font-size: clamp(24px, 4vw, 32px); }
+h3 { font-size: clamp(18px, 3vw, 24px); }
+h4 { font-size: clamp(14px, 2vw, 16px); }
 
-/* Paragraphs */
+/* Paragraphs with responsive font sizing */
 p {
+    font-size: clamp(14px, 2vw, 16px);
     line-height: 1.5;
-    margin: 0 0 16px;
+    margin: 0 0 var(--spacing-sm);
 }
 
-/* Highlight the active image link (bold, no underline) */
+/* Active state for image links */
 a[data-image].active {
     text-decoration: none;
     color: inherit;
 }
 
-/* Image section (left side on desktop, top on mobile) */
+/* Image section */
 #image-section {
     flex: 1;
-    background: url('https://assets.about.me/background/cjmartin_1286511296_43.jpg') no-repeat center center;
+    background: url('../images/horse.jpg') no-repeat center center;
     background-size: cover;
     transition: background-image 0.5s ease-in-out;
-    min-height: 50vh; /* Ensure the image section has a minimum height */
+    min-height: 50vh;
+    position: relative;
 }
 
-/* Text section (right side on desktop, bottom on mobile) */
+/* Overlay for better text contrast if needed */
+#image-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+    pointer-events: none;
+}
+
+/* Text section */
 #text-section {
     flex: 0.4;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 60px;
-    background-color: rgba(255, 255, 255, 0.9);
+    padding: var(--spacing-lg);
+    transition: all 0.3s ease;
+    background-color: var(--color-background);
 }
 
 #about {
-    max-width: 400px; /* Adjust as needed */
+    max-width: 400px;
     width: 100%;
     margin: 0 auto;
 }
 
-#about h1 {
-    font-size: 52px;
-}
-
+/* Mobile layout adjustments with simplification of media queries */
 @media (max-width: 1100px) {
-    #about h1 {
-        font-size: 36px;
-    }
-    #about p {
-        font-size: 15px;
+    #text-section {
+        padding: var(--spacing-md);
     }
 }
 
-@media (max-width: 800px) {
-    #about h1 {
-        font-size: 32px;
-    }
-}
-
-/* Mobile layout adjustments */
 @media (max-width: 768px) {
     body {
-        flex-direction: column; /* Stack elements vertically on mobile */
-        overflow-x: hidden; /* Prevent horizontal scrolling */
+        flex-direction: column;
+        overflow-x: hidden;
     }
     
     #image-section {
-        position: fixed; /* Fix the image section to the viewport */
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        min-height: 45vh;
+        height: 45vh;
         width: 100%;
-        z-index: 1; /* Lower z-index so text can overlap */
+        z-index: 1;
     }
     
     #text-section {
         position: relative;
         width: 100%;
-        margin-top: 40vh; /* Position slightly above the image section */
-        padding: 30px 20px; /* Reduced padding for mobile */
-        box-sizing: border-box;
+        margin-top: 40vh;
+        padding: var(--spacing-md) var(--spacing-sm);
         justify-content: flex-start;
-        z-index: 2; /* Higher z-index to appear above the image */
-        background-color: inherit; /* Solid background instead of transparent */
-        border-radius: 5px 5px 0 0; /* Rounded corners at the top */
-        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        z-index: 2;
+        border-radius: 10px 10px 0 0;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
     }
     
     #about {
-        max-width: 100%; /* Allow content to use full width on mobile */
-        padding-bottom: 30px; /* Add some padding at the bottom for scrolling */
+        max-width: 100%;
+        padding-bottom: var(--spacing-md);
     }
 }
 
 @media (max-width: 360px) {
-    #about h1 {
-        font-size: 28px;
+    #text-section {
+        padding: var(--spacing-sm) var(--spacing-xs);
+        margin-top: 38vh;
     }
-    #about p {
-        font-size: 14px;
+}
+
+/* Print styles */
+@media print {
+    body {
+        display: block;
+    }
+    
+    #image-section {
+        display: none;
     }
     
     #text-section {
-        padding: 20px 15px; /* Further reduce padding for very small screens */
+        padding: 0;
+        background: none;
+        width: 100%;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --color-text: #000;
+        --color-background: #fff;
+        --color-primary: #0000EE;
+        --color-primary-hover: #551A8B;
+    }
+    
+    #text-section {
+        box-shadow: 0 0 0 1px #000;
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
     }
 }
