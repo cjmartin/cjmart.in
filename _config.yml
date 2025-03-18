@@ -2,4 +2,8 @@ title: "Hi, I'm Chris"
 author: "Chris James Martin"
 description: "The personal website of Chris James Martin"
 baseurl: ""
-url: "https://cjmart.in"
+url: "https://www.cjmart.in"
+
+# Plugins
+plugins:
+  - jekyll-tidy

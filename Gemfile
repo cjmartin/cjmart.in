@@ -1,4 +1,12 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-gem 'github-pages', group: :jekyll_plugins
-gem 'webrick', '~> 1.8'
+# Jekyll
+gem "jekyll", "~> 4.2"
+
+# Plugins specified in _config.yml
+group :jekyll_plugins do
+  gem "jekyll-tidy"
+end
+
+# Needed for deployment via GitHub Actions
+gem "webrick", "~> 1.8"  # Required for Ruby 3+
