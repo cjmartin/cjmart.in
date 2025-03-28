@@ -8,16 +8,30 @@ document.addEventListener("DOMContentLoaded", function () {
           const imagePosition = activeLink.getAttribute("data-image-position");
           if (!imageName) return;
 
-          imageSection.style.backgroundImage = `url('/assets/images/${imageName}')`;
-          imageSection.style.backgroundPosition = imagePosition ? imagePosition : '';
-
-          // Remove "active" class from all image-changing links
-          document.querySelectorAll("#text-section a[data-image]").forEach(link => {
-              link.classList.remove("active");
-          });
-
-          // Add "active" class to the clicked link
-          activeLink.classList.add("active");
+          // Create a new image element to preload the image
+          const img = new Image();
+          
+          // Add loading indication
+          imageSection.classList.add("loading");
+          
+          // Set up the onload handler before setting the src
+          img.onload = function() {
+              // Apply the new image and position only after it's loaded
+              imageSection.style.backgroundImage = `url('/assets/images/${imageName}')`;
+              imageSection.style.backgroundPosition = imagePosition ? imagePosition : '';
+              imageSection.classList.remove("loading");
+              
+              // Remove "active" class from all image-changing links
+              document.querySelectorAll("#text-section a[data-image]").forEach(link => {
+                  link.classList.remove("active");
+              });
+              
+              // Add "active" class to the clicked link
+              activeLink.classList.add("active");
+          };
+          
+          // Start loading the image
+          img.src = `/assets/images/${imageName}`;
       }
   }
 
