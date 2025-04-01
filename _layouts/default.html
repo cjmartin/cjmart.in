@@ -6,6 +6,14 @@
     <title>{{ page.title }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;500;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+
+    <link rel="icon" type="image/png" href="{{ '/assets/images/favicons/favicon-light-icon-32x32.png' | relative_url }}" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" href="{{ '/assets/images/favicons/favicon-dark-icon-32x32.png' | relative_url }}" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ '/assets/images/favicons/favicon-dark-android-chrome-192x192.png' | relative_url }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ '/assets/images/favicons/favicon-dark-android-chrome-512x512.png' | relative_url }}">
+    <link rel="icon" type="image/x-icon" href="{{ '/assets/images/favicons/favicon-light.ico' | relative_url }}" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/x-icon" href="{{ '/assets/images/favicons/favicon-dark.ico' | relative_url }}" media="(prefers-color-scheme: light)">
+    <link rel="apple-touch-icon" href="{{ '/assets/images/favicons/favicon-dark-apple-touch-icon.png' | relative_url }}">
 </head>
 <body>
     <button id="theme-toggle" aria-label="Toggle dark mode">🌛</button>
