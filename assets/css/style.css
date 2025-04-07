@@ -111,11 +111,6 @@ a[data-image].active {
     position: relative;
 }
 
-/* Loading state for image */
-#image-section.loading {
-    opacity: 0.7;
-}
-
 /* Overlay for better text contrast if needed */
 #image-section::after {
     content: '';

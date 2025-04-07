@@ -57,16 +57,12 @@ function createImageRotator(config) {
     const imagePosition = activeLink.getAttribute("data-image-position") || "";
     
     if (!imageName) return;
-
-    // Add loading indication
-    imageSection.classList.add("loading");
     
     // Set up callback for after image loads
     const callback = () => {
       // Apply the new image and position
       imageSection.style.backgroundImage = `url('${config.basePath}${imageName}')`;
       imageSection.style.backgroundPosition = imagePosition;
-      imageSection.classList.remove("loading");
 
       // Update active link styling
       document.querySelectorAll(config.linkSelector).forEach(link => {
