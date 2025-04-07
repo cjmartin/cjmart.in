@@ -1,70 +1,130 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const imageSection = document.getElementById("image-section");
+document.addEventListener("DOMContentLoaded", () => {
+  const config = {
+    images: {
+      initialDelay: 10000, // 10 seconds before starting auto-rotation
+      rotationInterval: 5000, // 5 seconds between image changes
+      containerSelector: "#image-section",
+      linkSelector: "#text-section a[data-image]",
+      basePath: "/assets/images/"
+    },
+    email: {
+      linkId: "hello-link",
+      messageId: "hello-message",
+      clickId: "hello-click",
+      address: {
+        user: "hello",
+        domain: "cjmart",
+        tld: "in"
+      }
+    },
+    theme: {
+      toggleId: "theme-toggle",
+      darkClass: "dark-mode",
+      storageKey: "theme"
+    }
+  };
 
-  // Configuration variables
-  const initialDelay = 10000; // 10 seconds before starting auto-rotation
-  const rotationInterval = 5000; // 5 seconds between image changes
+  // Initialize all modules
+  const imageRotator = createImageRotator(config.images);
+  initEmailHandler(config.email);
+  initThemeToggle(config.theme);
+  
+  // Initialize from URL hash if present
+  const hash = window.location.hash.substring(1);
+  if (hash) {
+    const link = document.querySelector(`#text-section a[href="#${hash}"]`);
+    link && imageRotator.setImage(link);
+  }
+
+  // Start image auto-rotation after the initial delay
+  setTimeout(() => imageRotator.startAutoRotation(), config.images.initialDelay);
+});
+
+/**
+ * Image rotation module
+ */
+function createImageRotator(config) {
+  const imageSection = document.getElementById(config.containerSelector.substring(1));
+  const preloadedImages = {};
   let autoRotationTimer = null;
   let userInteracted = false;
 
+  // Image handling functions
   function setImage(activeLink) {
-    if (activeLink) {
-      const imageName = activeLink.getAttribute("data-image");
-      const imagePosition = activeLink.getAttribute("data-image-position");
-      if (!imageName) return;
+    if (!activeLink) return;
+    
+    const imageName = activeLink.getAttribute("data-image");
+    const imagePosition = activeLink.getAttribute("data-image-position") || "";
+    
+    if (!imageName) return;
 
-      // Create a new image element to preload the image
-      const img = new Image();
+    // Add loading indication
+    imageSection.classList.add("loading");
+    
+    // Set up callback for after image loads
+    const callback = () => {
+      // Apply the new image and position
+      imageSection.style.backgroundImage = `url('${config.basePath}${imageName}')`;
+      imageSection.style.backgroundPosition = imagePosition;
+      imageSection.classList.remove("loading");
 
-      // Add loading indication
-      imageSection.classList.add("loading");
+      // Update active link styling
+      document.querySelectorAll(config.linkSelector).forEach(link => {
+        link.classList.remove("active");
+      });
+      activeLink.classList.add("active");
+    };
 
-      // Set up the onload handler before setting the src
-      img.onload = function () {
-        // Apply the new image and position only after it's loaded
-        imageSection.style.backgroundImage = `url('/assets/images/${imageName}')`;
-        imageSection.style.backgroundPosition = imagePosition
-          ? imagePosition
-          : "";
-        imageSection.classList.remove("loading");
-
-        // Remove "active" class from all image-changing links
-        document
-          .querySelectorAll("#text-section a[data-image]")
-          .forEach((link) => {
-            link.classList.remove("active");
-          });
-
-        // Add "active" class to the clicked link
-        activeLink.classList.add("active");
-      };
-
-      // Start loading the image
-      img.src = `/assets/images/${imageName}`;
-    }
+    preloadImage(imageName, callback);
   }
 
-  // Auto-rotate images
-  function startAutoRotation() {
-    if (userInteracted) return; // Don't start if user has interacted
+  function preloadImage(imageName, callback) {
+    if (!imageName) {
+      callback?.();
+      return;
+    }
 
-    const imageLinks = Array.from(
-      document.querySelectorAll("#text-section a[data-image]"),
-    );
-    if (imageLinks.length <= 1) return; // Don't rotate if there's only one or no images
+    if (preloadedImages[imageName]) {
+      callback?.();
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      preloadedImages[imageName] = img;
+      callback?.();
+    };
+
+    img.onerror = () => {
+      console.error(`Failed to load image: ${imageName}`);
+      callback?.();
+    };
+
+    img.src = `${config.basePath}${imageName}`;
+  }
+
+  function startAutoRotation() {
+    if (userInteracted) return;
+
+    const imageLinks = Array.from(document.querySelectorAll(config.linkSelector));
+    if (imageLinks.length <= 1) return;
 
     let currentIndex = 0;
+    let nextIndex = 1;
 
-    // Find current active image index (if any)
-    const activeLink = document.querySelector(
-      "#text-section a[data-image].active",
-    );
+    // Find current active image index
+    const activeLink = document.querySelector(`${config.linkSelector}.active`);
     if (activeLink) {
       const activeIndex = imageLinks.indexOf(activeLink);
       if (activeIndex !== -1) {
         currentIndex = (activeIndex + 1) % imageLinks.length;
+        nextIndex = (currentIndex + 1) % imageLinks.length;
       }
     }
+
+    // Preload the next image
+    const nextImageName = imageLinks[nextIndex]?.getAttribute("data-image");
+    nextImageName && preloadImage(nextImageName);
 
     autoRotationTimer = setInterval(() => {
       if (userInteracted) {
@@ -74,100 +134,112 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Move to next image
       setImage(imageLinks[currentIndex]);
+
+      // Update indices for next cycle
       currentIndex = (currentIndex + 1) % imageLinks.length;
-    }, rotationInterval);
+      nextIndex = (currentIndex + 1) % imageLinks.length;
+
+      // Preload the image for the next cycle
+      const nextImageName = imageLinks[nextIndex]?.getAttribute("data-image");
+      nextImageName && preloadImage(nextImageName);
+    }, config.rotationInterval);
   }
 
-  // Check if the page is loaded with a hash (e.g., #dad)
-  const hash = window.location.hash.substring(1);
-  if (hash) {
-    const link = document.querySelector(`#text-section a[href="#${hash}"]`);
-    if (link) {
-      setImage(link);
-      userInteracted = true; // Consider hash navigation as user interaction
+  // Set up event delegation for image link clicks
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest(config.linkSelector);
+    if (!link) return;
+    
+    event.preventDefault();
+    userInteracted = true;
+    
+    // Stop auto-rotation
+    if (autoRotationTimer) {
+      clearInterval(autoRotationTimer);
     }
-  }
 
-  // Handle click events on image-changing links
-  document.querySelectorAll("#text-section a[data-image]").forEach((item) => {
-    item.addEventListener("click", function (event) {
-      event.preventDefault();
-      userInteracted = true; // User has clicked an image link
-
-      // Stop auto-rotation
-      if (autoRotationTimer) {
-        clearInterval(autoRotationTimer);
-      }
-
-      setImage(this);
-      history.replaceState(null, null, this.getAttribute("href"));
-    });
+    setImage(link);
+    history.replaceState(null, null, link.getAttribute("href"));
   });
 
-  // Email link
-  const hello = document.getElementById("hello-link");
+  return {
+    setImage,
+    startAutoRotation,
+    preloadImage
+  };
+}
 
-  if (hello) {
-    const hi = "hello";
-    const at = "cjmart";
-    const tld = "in";
-    const realEmail = hi + "@" + at + "." + tld;
+/**
+ * Email handler module
+ */
+function initEmailHandler({ linkId, messageId, clickId, address }) {
+  const hello = document.getElementById(linkId);
+  if (!hello) return;
 
-    hello.addEventListener("click", function (event) {
-      event.preventDefault(); // Prevent default mailto action
+  const realEmail = `${address.user}@${address.domain}.${address.tld}`;
 
-      // Copy email to clipboard
-      navigator.clipboard
-        .writeText(realEmail)
-        .then(() => {
-          // Update link text with the real email
-          hello.textContent = realEmail;
-          // Update message to say email has been copied
-          document.getElementById("hello-message").textContent =
-            "has been copied to your clipboard. Talk to you soon!";
-          document.getElementById("hello-click").style.display = "none";
-        })
-        .catch((err) => {
-          console.error("Failed to copy email:", err);
-        });
-    });
-  }
+  hello.addEventListener("click", (event) => {
+    event.preventDefault();
 
-  // Start the auto-rotation after the initial delay
-  setTimeout(() => {
-    startAutoRotation();
-  }, initialDelay);
+    navigator.clipboard.writeText(realEmail)
+      .then(() => {
+        // Update UI elements
+        hello.textContent = realEmail;
+        
+        const messageEl = document.getElementById(messageId);
+        if (messageEl) {
+          messageEl.textContent = "has been copied to your clipboard. Talk to you soon!";
+        }
+        
+        const clickEl = document.getElementById(clickId);
+        if (clickEl) {
+          clickEl.style.display = "none";
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to copy email:", err);
+      });
+  });
+}
 
-  // Dark/Light mode toggle
-  const toggleButton = document.getElementById("theme-toggle");
+/**
+ * Theme toggle module
+ */
+function initThemeToggle({ toggleId, darkClass, storageKey }) {
+  const toggleButton = document.getElementById(toggleId);
+  if (!toggleButton) return;
+
   const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+  const currentTheme = localStorage.getItem(storageKey);
 
-  // Load theme from localStorage
-  const currentTheme = localStorage.getItem("theme");
-
-  function updateIcon() {
-    if (document.body.classList.contains("dark-mode")) {
+  function updateTheme(isDark) {
+    if (isDark) {
+      document.body.classList.add(darkClass);
       toggleButton.textContent = "🌞"; // Sun for dark mode
     } else {
+      document.body.classList.remove(darkClass);
       toggleButton.textContent = "🌛"; // Moon for light mode
     }
   }
 
+  // Set initial theme
   if (currentTheme === "dark" || (!currentTheme && prefersDarkScheme.matches)) {
-    document.body.classList.add("dark-mode");
+    updateTheme(true);
+  } else {
+    updateTheme(false);
   }
 
-  updateIcon(); // Set initial icon
-
+  // Handle toggle clicks
   toggleButton.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-
-    if (document.body.classList.contains("dark-mode")) {
-      localStorage.setItem("theme", "dark");
-    } else {
-      localStorage.setItem("theme", "light");
-    }
-
-    updateIcon(); // Update icon after toggle
+    const isDarkMode = !document.body.classList.contains(darkClass);
+    updateTheme(isDarkMode);
+    localStorage.setItem(storageKey, isDarkMode ? "dark" : "light");
   });
-});
+  
+  // Listen for system preference changes
+  prefersDarkScheme.addEventListener("change", (e) => {
+    if (!localStorage.getItem(storageKey)) {
+      updateTheme(e.matches);
+    }
+  });
+}
