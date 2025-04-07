@@ -19,6 +19,7 @@ vendor/
 .vscode/
 *.swp
 *.swo
+CLAUDE.md
 
 # Environment variables
 .env

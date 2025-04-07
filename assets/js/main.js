@@ -1,9 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
   const imageSection = document.getElementById("image-section");
 
+  // Configuration variables
+  const initialDelay = 10000; // 10 seconds before starting auto-rotation
+  const rotationInterval = 5000; // 5 seconds between image changes
+  let autoRotationTimer = null;
+  let userInteracted = false;
+
   function setImage(activeLink) {
     if (activeLink) {
-      console.log(activeLink);
       const imageName = activeLink.getAttribute("data-image");
       const imagePosition = activeLink.getAttribute("data-image-position");
       if (!imageName) return;
@@ -39,12 +44,47 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Auto-rotate images
+  function startAutoRotation() {
+    if (userInteracted) return; // Don't start if user has interacted
+
+    const imageLinks = Array.from(
+      document.querySelectorAll("#text-section a[data-image]"),
+    );
+    if (imageLinks.length <= 1) return; // Don't rotate if there's only one or no images
+
+    let currentIndex = 0;
+
+    // Find current active image index (if any)
+    const activeLink = document.querySelector(
+      "#text-section a[data-image].active",
+    );
+    if (activeLink) {
+      const activeIndex = imageLinks.indexOf(activeLink);
+      if (activeIndex !== -1) {
+        currentIndex = (activeIndex + 1) % imageLinks.length;
+      }
+    }
+
+    autoRotationTimer = setInterval(() => {
+      if (userInteracted) {
+        clearInterval(autoRotationTimer);
+        return;
+      }
+
+      // Move to next image
+      setImage(imageLinks[currentIndex]);
+      currentIndex = (currentIndex + 1) % imageLinks.length;
+    }, rotationInterval);
+  }
+
   // Check if the page is loaded with a hash (e.g., #dad)
   const hash = window.location.hash.substring(1);
   if (hash) {
     const link = document.querySelector(`#text-section a[href="#${hash}"]`);
     if (link) {
       setImage(link);
+      userInteracted = true; // Consider hash navigation as user interaction
     }
   }
 
@@ -52,6 +92,13 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll("#text-section a[data-image]").forEach((item) => {
     item.addEventListener("click", function (event) {
       event.preventDefault();
+      userInteracted = true; // User has clicked an image link
+
+      // Stop auto-rotation
+      if (autoRotationTimer) {
+        clearInterval(autoRotationTimer);
+      }
+
       setImage(this);
       history.replaceState(null, null, this.getAttribute("href"));
     });
@@ -85,6 +132,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
   }
+
+  // Start the auto-rotation after the initial delay
+  setTimeout(() => {
+    startAutoRotation();
+  }, initialDelay);
 
   // Dark/Light mode toggle
   const toggleButton = document.getElementById("theme-toggle");
