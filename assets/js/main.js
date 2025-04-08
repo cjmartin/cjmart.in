@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const config = {
     images: {
       initialDelay: 10000, // 10 seconds before starting auto-rotation
-      rotationInterval: 5000, // 5 seconds between image changes
+      rotationInterval: 10000, // 10 seconds between image changes
       containerSelector: "#image-section",
       linkSelector: "#text-section a[data-image]",
       basePath: "/assets/images/"
